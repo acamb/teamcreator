@@ -1,10 +1,10 @@
-#Simple balanced team generator
+# Simple balanced team generator
 
-##Scope
+## Scope
 
 Have N partecipants,you need to generate balanced teams based on a score.
 
-##How it works
+## How it works
 
 This software generate balanced teams of N partecipants, given a score for each, using the simulated annealing technique.
 
@@ -35,7 +35,7 @@ An example report _PrintOutputReport_,which prints to the standard output, is pr
 
 Partecipants model needs to implement the _Item_ interface and provide a clone() method, a simple _Partecipant_ class is provided.
 
-##Embedding
+## Embedding
 
 ```
 TeamCreator creator = new TeamCreator();
