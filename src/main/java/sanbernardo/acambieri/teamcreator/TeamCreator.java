@@ -1,12 +1,11 @@
 package sanbernardo.acambieri.teamcreator;
 
+import sanbernardo.acambieri.teamcreator.datasource.DataSource;
 import sanbernardo.acambieri.teamcreator.datasource.DummyDataSource;
 import sanbernardo.acambieri.teamcreator.datasource.FileDataSource;
-import sanbernardo.acambieri.teamcreator.datasource.DataSource;
 import sanbernardo.acambieri.teamcreator.model.Config;
 import sanbernardo.acambieri.teamcreator.model.Group;
 import sanbernardo.acambieri.teamcreator.model.Item;
-import sanbernardo.acambieri.teamcreator.report.PrintOutputItalianReport;
 import sanbernardo.acambieri.teamcreator.report.PrintOutputReport;
 import sanbernardo.acambieri.teamcreator.report.Report;
 
@@ -15,7 +14,6 @@ import java.util.List;
 
 public class TeamCreator {
 
-    private DataSource ds;
     private static final int simulations = 1000000000;
 
     public static void main(String[] args){
@@ -43,7 +41,7 @@ public class TeamCreator {
         Config<Item> config = ds.getConfig();
         List<Group<Item>> solution = generateRandomSolution(config);
         List<Group<Item>> best;
-        Double target = config.getPartecipants().stream().mapToDouble(t -> t.getScore() ).average().getAsDouble();
+        Double target = config.getPartecipants().stream().mapToDouble(Item::getScore).average().getAsDouble();
         Double currentDistance = calculateMaxDistance(solution,target);
         best = solution;
         for (int i=0;i<simulations;i++){
@@ -78,37 +76,25 @@ public class TeamCreator {
     private List<Group<Item>> mutate(List<Group<Item>> solution){
         List<Group<Item>> newSolution = new ArrayList<>();
         solution.forEach(t -> newSolution.add(t.clone()));
-        /*Group group1 = newSolution.get((int)Math.random()*(newSolution.size()-1));
-        Group group2 = newSolution.get((int)Math.random()*(newSolution.size()-1));*/
-        Group group1 = newSolution.stream().max((a, b) -> (a.getAverageScore()-b.getAverageScore() ) > 0 ? 1 : -1).get();
-        Group group2 = newSolution.stream().min((a, b) -> (a.getAverageScore()-b.getAverageScore() ) > 0 ? 1 : -1).get();
+        Group<Item> group1 = newSolution.stream().max((a, b) -> (a.getAverageScore()-b.getAverageScore() ) > 0 ? 1 : -1).get();
+        Group<Item> group2 = newSolution.stream().min((a, b) -> (a.getAverageScore()-b.getAverageScore() ) > 0 ? 1 : -1).get();
         Item i = group1.removeRandom();
         group1.add(group2.swapWithRandom(i));
         return newSolution;
     }
 
-    private List<Group<Item>> generateRandomSolution(Config config){
+    private List<Group<Item>> generateRandomSolution(Config<Item> config){
         List<Group<Item>> solution = new ArrayList<>();
         List<Item> partecipants = new ArrayList<>(config.getPartecipants());
-        while(partecipants.size() > 0){
-            Group t = new Group();
+        while(!partecipants.isEmpty()){
+            Group<Item> t = new Group<>();
             for(int i = 0;i<config.getTeamSize();i++){
-                t.add(partecipants.remove((int)Math.random()*(partecipants.size()-1)));
+                t.add(partecipants.remove((int) (Math.random() * (partecipants.size() - 1))));
             }
             solution.add(t);
         }
         return solution;
     }
-/*  max distance from target
-    private Double calculateMaxDistance(List<Group> solution,Double target){
-        Double maxDistance = 0D;
-        for(Group t : solution) {
-            if(Math.abs(t.getAverageScore()-target) > maxDistance){
-                maxDistance=Math.abs(t.getAverageScore()-target);
-            }
-        }
-        return maxDistance;
-    }*/
 
     private Double calculateMaxDistance(List<Group<Item>> solution, Double target){
         return solution.stream().mapToDouble(Group::getAverageScore).max().getAsDouble() - solution.stream().mapToDouble(Group::getAverageScore).min().getAsDouble();

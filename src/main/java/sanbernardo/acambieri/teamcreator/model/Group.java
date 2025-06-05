@@ -15,10 +15,6 @@ public class Group<T extends Item> implements Cloneable {
         return items;
     }
 
-    public void setItems(List<T> items) {
-        this.items = items;
-    }
-
     public T swapWithRandom(T item){
         T removed = removeRandom();
         items.add(item);
@@ -26,7 +22,7 @@ public class Group<T extends Item> implements Cloneable {
     }
 
     public T removeRandom(){
-        return items.remove((int)Math.random()*(items.size()-1));
+        return items.remove((int) (Math.random() * (items.size() - 1)));
     }
 
     public void add(T item){
@@ -46,9 +42,9 @@ public class Group<T extends Item> implements Cloneable {
 
 
     @Override
-    public Group clone() {
-        Group t = new Group();
-        items.forEach(i -> t.add(i.clone()));
+    public Group<T> clone() {
+        Group<T> t = new Group<>();
+        items.forEach(i -> t.add((T) i.clone()));
         return t;
     }
 }

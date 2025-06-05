@@ -11,20 +11,20 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.stream.Stream;
 
-public class FileDataSource implements DataSource{
+public class FileDataSource implements DataSource<Item>{
 
-    private Config config;
+    private final Config<Item> config;
     Logger log;
 
     public FileDataSource(String file){
         log= LoggerFactory.getLogger(getClass());
-        //List<Item> partecipants = Files.lines(Paths.get(file)).map(FileDataSource::parseLine).collect(Collectors.toList());
-        config = new Config(3,new ArrayList<Item>(),100D,0.02D);
-        try {
-            Files.lines(Paths.get(file)).filter(s -> !s.contains("#")).forEach(line -> {
+        config = new Config<>(3,new ArrayList<>(),100D,0.02D);
+        try (final Stream<String> lines = Files.lines(Paths.get(file))) {
+            lines.filter(s -> !s.contains("#")).forEach(line -> {
                 try {
-                    String tokens[] = line.split("=");
+                    String[] tokens = line.split("=");
                     switch (tokens[0]) {
                         case "temperature":
                             config.setTemperature(Double.parseDouble(tokens[1]));
@@ -51,12 +51,12 @@ public class FileDataSource implements DataSource{
     }
 
     @Override
-    public Config getConfig() {
+    public Config<Item> getConfig() {
         return config;
     }
 
     public static Item parseItem(String token) throws ParseItemException{
-        String split[]=token.split(";");
+        String[] split = token.split(";");
         return new Partecipant().setName(split[0]).setSurname(split[1]).setScore(Double.parseDouble(split[2]));
     }
 }
