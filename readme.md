@@ -45,3 +45,17 @@ creator.run(ds,report);
 ```
 
 `DataSource.getConfig()` is invoked to fetch data and configuration values, `report.generateReport()` is used at the end of the simulation to generate a result. 
+
+
+## Input file example
+```text
+temperature=100
+rate=0.02
+teamSize=3
+name1;surname1;8.5
+name2;surname2;7
+name3;surname3;4.2
+name4;surname4;8.1
+name5;surname5;7.2
+name6;surname6;5.52
+```
